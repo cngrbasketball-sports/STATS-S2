@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Congre Basketball Olympics Season 2 - Live Stat Sheet</title>
+    <style>
+        :root {
+            --primary-bg: #0b1120;
+            --card-bg: #1e293b;
+            --accent-gold: #f59e0b;
+            --accent-blue: #3b82f6;
+            --border-color: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger-red: #ef4444;
+            --success-green: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            padding: 12px;
+            font-size: 15px;
+            overflow-x: hidden;
+        }
+
+        /* RESPONSIVE HEADER */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-logo {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--accent-gold);
+            background-color: #000;
+        }
+
+        .header-title-container {
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 10px;
+        }
+
+        .header-title-container h1 {
+            color: var(--accent-gold);
+            font-size: 1.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-title-container p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        /* NAVIGATION TABS (TOUCH OPTIMIZED) */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 8px;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        .nav-tabs::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 4px;
+        }
+
+        .nav-btn {
+            background: #1e293b;
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn:active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .nav-btn.active {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+        }
+
+        .nav-btn.matchup-btn {
+            background: var(--accent-blue);
+            color: #fff;
+            border-color: var(--accent-blue);
+        }
+
+        .nav-btn.matchup-btn.active {
+            background: #2563eb;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
+        }
+
+        .tab-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* VIEWS */
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        /* MATCHUP CONTROLS */
+        .matchup-selector-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .team-select-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .team-select-box select {
+            width: 100%;
+            background: #1e293b;
+            color: #fff;
+            padding: 8px 12px;
+            border: 2px solid var(--accent-gold);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .versus-badge {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            padding: 4px 14px;
+            background: #1e293b;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 0 auto;
+        }
+
+        /* QUARTER FILTER SWITCH */
+        .quarter-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f172a;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .q-btn {
+            background: #1e293b;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .q-btn.active {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+        }
+
+        /* VERTICAL MATCHUP GRID */
+        .matchup-grid-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* CARDS & TABLES */
+        .team-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .team-header-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 5px solid var(--accent-gold);
+        }
+
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-header-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-gold);
+        }
+
+        .team-header-banner h2 {
+            font-size: 1.25rem;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+        }
+
+        .team-score-badge {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #4ade80;
+            background: #1e293b;
+            padding: 4px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table.stat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        table.stat-table th, table.stat-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px 4px;
+        }
+
+        table.stat-table th {
+            background-color: #0f172a;
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 0.88rem;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        table.stat-table tr:nth-child(even) {
+            background-color: #172033;
+        }
+
+        .player-col {
+            text-align: left !important;
+            padding-left: 10px !important;
+            white-space: nowrap;
+            min-width: 160px;
+            font-weight: 700;
+            font-size: 0.98rem;
+            position: sticky;
+            left: 0;
+            background: #1e293b;
+            z-index: 1;
+        }
+
+        table.stat-table tr:nth-child(even) .player-col {
+            background: #172033;
+        }
+
+        /* ENLARGED TOUCH STEPPERS */
+        .stepper-unit {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #0f172a;
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1.5px solid #334155;
+            min-width: 64px;
+            justify-content: center;
+        }
+
+        .stat-val {
+            width: 24px;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .step-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .step-btn {
+            background: #334155;
+            color: #fff;
+            border: none;
+            width: 22px;
+            height: 16px;
+            line-height: 14px;
+            font-size: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-btn:active {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        .step-btn.dn {
+            background: #1e293b;
+            color: var(--text-muted);
+        }
+
+        .step-btn.dn:active {
+            background: var(--danger-red);
+            color: #fff;
+        }
+
+        .pts-cell {
+            color: #4ade80 !important;
+            font-size: 1.15rem;
+            font-weight: 900;
+        }
+
+        .pct-cell {
+            color: #38bdf8;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        tfoot tr {
+            background: #0f172a !important;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* ROSTER MANAGEMENT STYLES */
+        .roster-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .roster-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .roster-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        .roster-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.98rem;
+        }
+
+        .roster-item.inactive {
+            opacity: 0.5;
+            border-color: var(--danger-red);
+        }
+
+        .playing-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .playing-toggle input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .action-btn {
+            background: var(--card-bg);
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .action-btn:active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* MEDIA QUERIES FOR PHONES & TABLETS */
+        @media (max-width: 600px) {
+            body { padding: 8px; }
+            .header-logo { width: 50px; height: 50px; }
+            .header-title-container h1 { font-size: 1.25rem; }
+            .header-title-container p { font-size: 0.8rem; }
+            .team-header-banner h2 { font-size: 1.05rem; }
+            .team-score-badge { font-size: 1.2rem; padding: 2px 10px; }
+            .stepper-unit { min-width: 58px; padding: 2px 4px; }
+            .stat-val { font-size: 1rem; }
+            .step-btn { width: 20px; height: 14px; font-size: 9px; }
+        }
+
+        @media print {
+            body { background: #fff; color: #000; }
+            .nav-tabs, .matchup-selector-bar, .quarter-filter-bar, .actions-bar, .step-btns { display: none !important; }
+            .team-card { background: #fff; border: 1px solid #000; }
+            table.stat-table th { background: #eee !important; color: #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <img src="840069523_1617887930033821_6965812852497925699_n.jpg" class="header-logo" onerror="this.src='https://via.placeholder.com/65/0f172a/f59e0b?text=CBL'">
+        <div class="header-title-container">
+            <h1>Congre Basketball Olympics</h1>
+            <p>Season 2 — Live Match Stat Tracker</p>
+        </div>
+        <img src="839859719_930183739880776_4844381458750892179_n.jpg" class="header-logo" onerror="this.src='https://via.placeholder.com/65/0f172a/f59e0b?text=S2'">
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="nav-btn matchup-btn active" onclick="switchTab('matchup-view')">⚡ LIVE MATCH-UP VIEW</button>
+        <button class="nav-btn" onclick="switchTab('percentages-view')">📊 OVERALL PERCENTAGES & BOX SCORE</button>
+        <button class="nav-btn" onclick="switchTab('team-URBAN')"><img src="Urban.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> Urban Hoopers</button>
+        <button class="nav-btn" onclick="switchTab('team-BALDOG')"><img src="baldog.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> Baldogiii</button>
+        <button class="nav-btn" onclick="switchTab('team-WAR')"><img src="total war.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> Total War</button>
+        <button class="nav-btn" onclick="switchTab('team-ARCOM')"><img src="arcom.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> Arcom Steele</button>
+        <button class="nav-btn" onclick="switchTab('team-TRUE')"><img src="true.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> True Baller</button>
+        <button class="nav-btn" onclick="switchTab('team-HOB')"><img src="HOB.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> House of Ballers</button>
+        <button class="nav-btn" onclick="switchTab('team-DRAGONS')"><img src="dragons.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> Dragons</button>
+        <button class="nav-btn" onclick="switchTab('team-OTITS')"><img src="otits.jpg" class="tab-icon" onerror="this.src='https://via.placeholder.com/22'"> Otits</button>
+    </nav>
+
+    <div class="actions-bar">
+        <button class="action-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="action-btn" onclick="exportCSV()">📥 Download CSV</button>
+    </div>
+
+    <!-- LIVE MATCHUP VIEW (TOP AND BOTTOM) -->
+    <div id="matchup-view" class="view-panel active">
+        <div class="matchup-selector-bar">
+            <div class="team-select-box">
+                <label style="color:var(--accent-gold); font-weight:bold;">HOME TEAM (TOP):</label>
+                <select id="homeTeamSelect" onchange="renderMatchup()"></select>
+            </div>
+            <div class="versus-badge">VS</div>
+            <div class="team-select-box">
+                <label style="color:var(--accent-gold); font-weight:bold;">AWAY TEAM (BOTTOM):</label>
+                <select id="awayTeamSelect" onchange="renderMatchup()"></select>
+            </div>
+        </div>
+
+        <div class="quarter-filter-bar">
+            <span style="color:var(--text-muted); font-weight:bold; margin-right:5px; font-size:0.95rem;">QUARTER FILTER:</span>
+            <button class="q-btn active" onclick="setQuarterView('ALL')">ALL QUARTERS</button>
+            <button class="q-btn" onclick="setQuarterView('Q1')">Q1 ONLY</button>
+            <button class="q-btn" onclick="setQuarterView('Q2')">Q2 ONLY</button>
+            <button class="q-btn" onclick="setQuarterView('Q3')">Q3 ONLY</button>
+            <button class="q-btn" onclick="setQuarterView('Q4')">Q4 ONLY</button>
+        </div>
+
+        <div class="matchup-grid-vertical">
+            <!-- HOME TEAM (TOP) -->
+            <div id="homeMatchupContainer" class="team-card"></div>
+            <!-- AWAY TEAM (BOTTOM) -->
+            <div id="awayMatchupContainer" class="team-card"></div>
+        </div>
+    </div>
+
+    <!-- OVERALL PERCENTAGES & COMBINED BOX SCORE VIEW -->
+    <div id="percentages-view" class="view-panel">
+        <div class="matchup-grid-vertical">
+            <div id="homePercentagesContainer" class="team-card"></div>
+            <div id="awayPercentagesContainer" class="team-card"></div>
+        </div>
+    </div>
+
+    <!-- ROSTER MANAGEMENT VIEWS -->
+    <div id="single-team-views"></div>
+
+    <script>
+        let currentQuarterFilter = 'ALL';
+
+        const teamsData = {
+            "URBAN": {
+                name: "URBAN HOOPERS", logo: "Urban.jpg",
+                roster: [
+                    {id: "u16", jersey: 16, name: "DELA CRUZ, VINCE", active: true},
+                    {id: "u9", jersey: 9, name: "CANCILLER, NATANIEL", active: true},
+                    {id: "u17", jersey: 17, name: "LAYA, GEMEROL", active: true},
+                    {id: "u18", jersey: 18, name: "CANONIZADO, AZER", active: true},
+                    {id: "u33", jersey: 33, name: "TABAG, JASON", active: true},
+                    {id: "u26", jersey: 26, name: "HERNANDEZ, REN", active: true},
+                    {id: "u8", jersey: 8, name: "QUIDILLA, JOHN", active: true},
+                    {id: "u1", jersey: 1, name: "HUBILLA, JONEE", active: true},
+                    {id: "u7", jersey: 7, name: "RAMOS, MARK", active: true},
+                    {id: "u5", jersey: 5, name: "MARTIN, KENJIE", active: true},
+                    {id: "u6", jersey: 6, name: "GLORIANI, PRINCE", active: true},
+                    {id: "u77", jersey: 77, name: "JAVIER, IAN", active: true},
+                    {id: "u3", jersey: 3, name: "GOROSPE, RIDGE (RSV)", active: true}
+                ]
+            },
+            "BALDOG": {
+                name: "BALDOGIII", logo: "baldog.jpg",
+                roster: [
+                    {id: "b21", jersey: 21, name: "ASINAS, JONATHAN", active: true},
+                    {id: "b6", jersey: 6, name: "SONG, PHILKO", active: true},
+                    {id: "b8", jersey: 8, name: "SISON, JAMES", active: true},
+                    {id: "b0", jersey: 0, name: "HERNANDEZ, JESSY", active: true},
+                    {id: "b9", jersey: 9, name: "MAGSINO, ERICK", active: true},
+                    {id: "b3", jersey: 3, name: "GARCIA, MATT", active: true},
+                    {id: "b12", jersey: 12, name: "ADEL, IVAN", active: true},
+                    {id: "b2", jersey: 2, name: "PAMATMAT, JULL", active: true},
+                    {id: "b7", jersey: 7, name: "CASTILLO, CARLO", active: true},
+                    {id: "b30", jersey: 30, name: "MANLULU, CARLOS", active: true},
+                    {id: "b29", jersey: 29, name: "GUIBONE, LOREN", active: true},
+                    {id: "b27", jersey: 27, name: "PANGILINAN, LESTERN", active: true}
+                ]
+            },
+            "WAR": {
+                name: "TOTAL WAR", logo: "total war.jpg",
+                roster: [
+                    {id: "w24", jersey: 24, name: "LORENZO, LLOYD", active: true},
+                    {id: "w9", jersey: 9, name: "RAYOS, CLYDE", active: true},
+                    {id: "w18", jersey: 18, name: "BUENAVISTA, JOEL", active: true},
+                    {id: "w8", jersey: 8, name: "REBUCA, BRIAN", active: true},
+                    {id: "w2", jersey: 2, name: "DELA CRUZ, ROGER", active: true},
+                    {id: "w12", jersey: 12, name: "FLANDEZ, GIE", active: true},
+                    {id: "w11", jersey: 11, name: "GERVACIO, JORNEL", active: true},
+                    {id: "w28", jersey: 28, name: "ARCANGELES, ERWIN", active: true},
+                    {id: "w3", jersey: 3, name: "VILLAVICENCIO, RAFAELLE", active: true},
+                    {id: "w26", jersey: 26, name: "GATTOC, HOMER", active: true},
+                    {id: "w1", jersey: 1, name: "RUEDA, PETER", active: true},
+                    {id: "w22", jersey: 22, name: "LOPEZ, FRANK", active: true}
+                ]
+            },
+            "ARCOM": {
+                name: "ARCOM STEELE", logo: "arcom.jpg",
+                roster: [
+                    {id: "a6", jersey: 6, name: "PRESNILLO, SJAY", active: true},
+                    {id: "a10", jersey: 10, name: "POLO, GIAN", active: true},
+                    {id: "a5", jersey: 5, name: "COMMANDANTE, PATRICK", active: true},
+                    {id: "a8", jersey: 8, name: "AMBAL, MARKUS", active: true},
+                    {id: "a26", jersey: 26, name: "EVANGELISTA, CHA", active: true},
+                    {id: "a18", jersey: 18, name: "CASTILLEJOS, YORAM", active: true},
+                    {id: "a9", jersey: 9, name: "HERNANDEZ, JC", active: true},
+                    {id: "a33", jersey: 33, name: "JADOC, JOHN", active: true},
+                    {id: "a30", jersey: 30, name: "ASPI, LEX", active: true},
+                    {id: "a15", jersey: 15, name: "POLO, RALPH", active: true},
+                    {id: "a1", jersey: 1, name: "BUENO, BRON", active: true},
+                    {id: "a11", jersey: 11, name: "RUSSELL, RENZ CAASI", active: true}
+                ]
+            },
+            "TRUE": {
+                name: "TRUE BALLER", logo: "true.jpg",
+                roster: [
+                    {id: "t11", jersey: 11, name: "ZAMORA, RENZ", active: true},
+                    {id: "t12", jersey: 12, name: "ROSALES, ALLAN", active: true},
+                    {id: "t24", jersey: 24, name: "SALUGAO, RICHARD", active: true},
+                    {id: "t15", jersey: 15, name: "RAMILO, NICSON", active: true},
+                    {id: "t6", jersey: 6, name: "CALUAG, CHRISTIAN", active: true},
+                    {id: "t17", jersey: 17, name: "PLACIDO, ZACHARY", active: true},
+                    {id: "t7", jersey: 7, name: "FRANCISCO, RENZO", active: true},
+                    {id: "t8", jersey: 8, name: "AVELLANEDA, MARCO", active: true},
+                    {id: "t55", jersey: 55, name: "CUENZA, JHANREY", active: true},
+                    {id: "t20", jersey: 20, name: "FERNANDEZ, JAYSI", active: true},
+                    {id: "t3", jersey: 3, name: "REMOLIN, MARVIN", active: true},
+                    {id: "t4", jersey: 4, name: "NATIVIDAD, CHRISTIANSON", active: true}
+                ]
+            },
+            "HOB": {
+                name: "HOUSE OF BALLERS", logo: "HOB.jpg",
+                roster: [
+                    {id: "h3", jersey: 3, name: "UMIPIG, NICO", active: true},
+                    {id: "h9", jersey: 9, name: "MANAOG, ELIJAH", active: true},
+                    {id: "h4", jersey: 4, name: "PASA, MARX", active: true},
+                    {id: "h23", jersey: 23, name: "TUPRIO, AKEEM", active: true},
+                    {id: "h14", jersey: 14, name: "MANGONA, KESTER", active: true},
+                    {id: "h5", jersey: 5, name: "CARIÑO, CLEMEN", active: true},
+                    {id: "h17", jersey: 17, name: "CAÑABANO, ROBIN", active: true},
+                    {id: "h6", jersey: 6, name: "TANAEL, LOUIE", active: true},
+                    {id: "h20", jersey: 20, name: "DE CASTRO, KEVIN", active: true},
+                    {id: "h67", jersey: 67, name: "TAGROS, CHASEL", active: true},
+                    {id: "h7", jersey: 7, name: "ROCERO, RAP", active: true},
+                    {id: "h10", jersey: 10, name: "LOO, ALVARO", active: true},
+                    {id: "h1", jersey: 1, name: "VICENTE, EMMAN (RSV)", active: true}
+                ]
+            },
+            "DRAGONS": {
+                name: "DRAGONS", logo: "dragons.jpg",
+                roster: [
+                    {id: "d22", jersey: 22, name: "COSTALES, ALEXIS", active: true},
+                    {id: "d32", jersey: 32, name: "WONG, JOHNSON", active: true},
+                    {id: "d14", jersey: 14, name: "LAQUINDANUM, MARLOU", active: true},
+                    {id: "d3", jersey: 3, name: "PEREZ, ABIEL", active: true},
+                    {id: "d25", jersey: 25, name: "DEPON, TOTO", active: true},
+                    {id: "d26", jersey: 26, name: "LUGTU, TROA", active: true},
+                    {id: "d13", jersey: 13, name: "GAURANO, RG", active: true},
+                    {id: "d42", jersey: 42, name: "GUMAPAC, ALVITTO", active: true},
+                    {id: "d11", jersey: 11, name: "SISON, HIRNAN", active: true},
+                    {id: "d18", jersey: 18, name: "TONGOL, BON", active: true},
+                    {id: "d20", jersey: 20, name: "MAURICIO, IAN", active: true},
+                    {id: "d2", jersey: 2, name: "PAUSANOS, MARK", active: true},
+                    {id: "d25r", jersey: 25, name: "MALUPET, ABET GUMAPAC (RSV)", active: true}
+                ]
+            },
+            "OTITS": {
+                name: "OTITS", logo: "otits.jpg",
+                roster: [
+                    {id: "o16", jersey: 16, name: "DADULA, CHOI", active: true},
+                    {id: "o25", jersey: 25, name: "ACUÑA, HANNZ", active: true},
+                    {id: "o30", jersey: 30, name: "SANTIAGO, MARLON", active: true},
+                    {id: "o18", jersey: 18, name: "BERSAMINA, IAN", active: true},
+                    {id: "o1", jersey: 1, name: "LACSAMANA, CECIL", active: true},
+                    {id: "o14", jersey: 14, name: "BARBECHO JR., MELQUIADES", active: true},
+                    {id: "o23", jersey: 23, name: "MALALUAN, GARY", active: true},
+                    {id: "o22", jersey: 22, name: "BANDOJO, JEFFREY", active: true},
+                    {id: "o7", jersey: 7, name: "ANTONIO, ALADDIN TITIYOKIMASH", active: true},
+                    {id: "o2", jersey: 2, name: "AMARE, PAOLO SEMILLA", active: true},
+                    {id: "o89", jersey: 89, name: "ORILLAZA, GHIO", active: true},
+                    {id: "o4", jersey: 4, name: "VILLANUEVA, ARDIE", active: true},
+                    {id: "o13", jersey: 13, name: "TRES, EMS SIBS (RSV)", active: true}
+                ]
+            }
+        };
+
+        const statsData = {};
+
+        document.addEventListener("DOMContentLoaded", () => {
+            populateSelects();
+            renderRosterManagementViews();
+            renderMatchup();
+        });
+
+        function populateSelects() {
+            const homeSelect = document.getElementById("homeTeamSelect");
+            const awaySelect = document.getElementById("awayTeamSelect");
+            let keys = Object.keys(teamsData);
+
+            keys.forEach(key => {
+                homeSelect.innerHTML += `<option value="${key}">${teamsData[key].name}</option>`;
+                awaySelect.innerHTML += `<option value="${key}">${teamsData[key].name}</option>`;
+            });
+
+            homeSelect.value = keys[0];
+            awaySelect.value = keys[1];
+        }
+
+        function togglePlayerActive(teamKey, playerId) {
+            let player = teamsData[teamKey].roster.find(p => p.id === playerId);
+            if (player) {
+                player.active = !player.active;
+                renderRosterManagementViews();
+                renderMatchup();
+            }
+        }
+
+        function renderRosterManagementViews() {
+            const container = document.getElementById("single-team-views");
+            container.innerHTML = "";
+
+            Object.keys(teamsData).forEach(teamKey => {
+                const team = teamsData[teamKey];
+                let rosterItemsHTML = "";
+
+                team.roster.forEach(player => {
+                    rosterItemsHTML += `
+                        <div class="roster-item ${player.active ? '' : 'inactive'}">
+                            <div>
+                                <strong style="color:var(--accent-gold);">#${player.jersey}</strong> 
+                                <span>${player.name}</span>
+                            </div>
+                            <label class="playing-toggle">
+                                <input type="checkbox" ${player.active ? 'checked' : ''} onchange="togglePlayerActive('${teamKey}', '${player.id}')">
+                                <span>${player.active ? 'PLAYING' : 'DNP'}</span>
+                            </label>
+                        </div>
+                    `;
+                });
+
+                const viewDiv = document.createElement("div");
+                viewDiv.id = `team-${teamKey}`;
+                viewDiv.className = "view-panel";
+                viewDiv.innerHTML = `
+                    <div class="roster-card">
+                        <div class="roster-header">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <img src="${team.logo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-gold);">
+                                <h2 style="color:var(--accent-gold);">${team.name} — GAME ROSTER</h2>
+                            </div>
+                            <span style="color:var(--text-muted); font-size:0.9rem;">Uncheck players who are not playing today</span>
+                        </div>
+                        <div class="roster-list">${rosterItemsHTML}</div>
+                    </div>
+                `;
+                container.appendChild(viewDiv);
+            });
+        }
+
+        function makeStepper(prefix, pId, statKey) {
+            const key = `${prefix}_${pId}_${statKey}`;
+            if (!(key in statsData)) statsData[key] = 0;
+
+            return `
+                <div class="stepper-unit">
+                    <span class="stat-val" id="val_${key}">${statsData[key]}</span>
+                    <div class="step-btns">
+                        <button class="step-btn" onclick="stepStat('${prefix}', '${pId}', '${statKey}', 1)">▲</button>
+                        <button class="step-btn dn" onclick="stepStat('${prefix}', '${pId}', '${statKey}', -1)">▼</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function stepStat(prefix, pId, statKey, delta) {
+            const key = `${prefix}_${pId}_${statKey}`;
+            if (!(key in statsData)) statsData[key] = 0;
+            statsData[key] = Math.max(0, statsData[key] + delta);
+
+            if (delta > 0) {
+                if (statKey.endsWith('m2')) stepStat(prefix, pId, statKey.replace('m2', 'a2'), 1);
+                if (statKey.endsWith('m3')) stepStat(prefix, pId, statKey.replace('m3', 'a3'), 1);
+                if (statKey.endsWith('m4')) stepStat(prefix, pId, statKey.replace('m4', 'a4'), 1);
+                if (statKey.endsWith('ftm')) stepStat(prefix, pId, statKey.replace('ftm', 'fta'), 1);
+            }
+
+            const valEl = document.getElementById(`val_${key}`);
+            if (valEl) valEl.textContent = statsData[key];
+            updateRowAndTotals(prefix, pId);
+        }
+
+        function getStatVal(prefix, pId, statKey) {
+            return statsData[`${prefix}_${pId}_${statKey}`] || 0;
+        }
+
+        function updateRowAndTotals(prefix, pId) {
+            let m2 = 0, a2 = 0, m3 = 0, a3 = 0, m4 = 0, a4 = 0, ftm = 0, fta = 0;
+            ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                m2 += getStatVal(prefix, pId, `${q}_m2`);
+                a2 += getStatVal(prefix, pId, `${q}_a2`);
+                m3 += getStatVal(prefix, pId, `${q}_m3`);
+                a3 += getStatVal(prefix, pId, `${q}_a3`);
+                m4 += getStatVal(prefix, pId, `${q}_m4`);
+                a4 += getStatVal(prefix, pId, `${q}_a4`);
+                ftm += getStatVal(prefix, pId, `${q}_ftm`);
+                fta += getStatVal(prefix, pId, `${q}_fta`);
+            });
+
+            const pts = (m2 * 2) + (m3 * 3) + (m4 * 4) + ftm;
+
+            const ptsEl = document.getElementById(`pts_${prefix}_${pId}`);
+            if (ptsEl) ptsEl.textContent = pts;
+
+            calcTableTotals(prefix);
+        }
+
+        function buildStatTableHTML(teamKey, prefix) {
+            const team = teamsData[teamKey];
+            const activePlayers = team.roster.filter(p => p.active);
+            let rowsHTML = "";
+
+            if (activePlayers.length === 0) {
+                rowsHTML = `<tr><td colspan="25" style="padding:20px; color:var(--text-muted);">No active players selected for today's game. Enable players in the team roster view.</td></tr>`;
+            } else {
+                activePlayers.forEach(player => {
+                    const pId = player.id;
+                    rowsHTML += `<tr id="row_${prefix}_${pId}">
+                        <td><strong>${player.jersey}</strong></td>
+                        <td class="player-col">${player.name}</td>`;
+
+                    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+                    quarters.forEach(q => {
+                        const qLower = q.toLowerCase();
+                        if (currentQuarterFilter === 'ALL' || currentQuarterFilter === q) {
+                            rowsHTML += `
+                                <td>${makeStepper(prefix, pId, `${qLower}_m2`)}</td><td>${makeStepper(prefix, pId, `${qLower}_a2`)}</td>
+                                <td>${makeStepper(prefix, pId, `${qLower}_m3`)}</td><td>${makeStepper(prefix, pId, `${qLower}_a3`)}</td>
+                                <td>${makeStepper(prefix, pId, `${qLower}_m4`)}</td><td>${makeStepper(prefix, pId, `${qLower}_a4`)}</td>
+                                <td>${makeStepper(prefix, pId, `${qLower}_ftm`)}</td><td>${makeStepper(prefix, pId, `${qLower}_fta`)}</td>
+                            `;
+                        }
+                    });
+
+                    rowsHTML += `
+                        <td>${makeStepper(prefix, pId, 'reb')}</td>
+                        <td>${makeStepper(prefix, pId, 'ast')}</td>
+                        <td>${makeStepper(prefix, pId, 'stl')}</td>
+                        <td>${makeStepper(prefix, pId, 'blk')}</td>
+                        <td>${makeStepper(prefix, pId, 'to')}</td>
+                        <td>${makeStepper(prefix, pId, 'pf')}</td>
+                        <td class="pts-cell" id="pts_${prefix}_${pId}">0</td>
+                    </tr>`;
+                });
+            }
+
+            return `
+                <div class="team-header-banner">
+                    <div class="team-info">
+                        <img src="${team.logo}" class="team-header-logo" onerror="this.src='https://via.placeholder.com/45'">
+                        <h2>${team.name}</h2>
+                    </div>
+                    <div class="team-score-badge" id="teamScore_${prefix}">0 PTS</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="stat-table" id="table_${prefix}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="player-col">PLAYER</th>
+                                ${getHeadersForFilter()}
+                                <th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PF</th>
+                                <th>PTS</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function buildPercentagesTableHTML(teamKey, prefix) {
+            const team = teamsData[teamKey];
+            const activePlayers = team.roster.filter(p => p.active);
+            let rowsHTML = "";
+
+            if (activePlayers.length === 0) {
+                rowsHTML = `<tr><td colspan="17" style="padding:20px; color:var(--text-muted);">No active players selected for today's game.</td></tr>`;
+            } else {
+                activePlayers.forEach(player => {
+                    const pId = player.id;
+                    let m2 = 0, a2 = 0, m3 = 0, a3 = 0, m4 = 0, a4 = 0, ftm = 0, fta = 0;
+                    ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                        m2 += getStatVal(prefix, pId, `${q}_m2`);
+                        a2 += getStatVal(prefix, pId, `${q}_a2`);
+                        m3 += getStatVal(prefix, pId, `${q}_m3`);
+                        a3 += getStatVal(prefix, pId, `${q}_a3`);
+                        m4 += getStatVal(prefix, pId, `${q}_m4`);
+                        a4 += getStatVal(prefix, pId, `${q}_a4`);
+                        ftm += getStatVal(prefix, pId, `${q}_ftm`);
+                        fta += getStatVal(prefix, pId, `${q}_fta`);
+                    });
+
+                    const pct2 = a2 > 0 ? Math.round((m2/a2)*100)+'%' : '0%';
+                    const pct3 = a3 > 0 ? Math.round((m3/a3)*100)+'%' : '0%';
+                    const pct4 = a4 > 0 ? Math.round((m4/a4)*100)+'%' : '0%';
+                    const ftpct = fta > 0 ? Math.round((ftm/fta)*100)+'%' : '0%';
+                    const pts = (m2 * 2) + (m3 * 3) + (m4 * 4) + ftm;
+
+                    rowsHTML += `<tr>
+                        <td><strong>${player.jersey}</strong></td>
+                        <td class="player-col">${player.name}</td>
+                        <td>${m2}/${a2}</td><td class="pct-cell">${pct2}</td>
+                        <td>${m3}/${a3}</td><td class="pct-cell">${pct3}</td>
+                        <td>${m4}/${a4}</td><td class="pct-cell">${pct4}</td>
+                        <td>${ftm}/${fta}</td><td class="pct-cell">${ftpct}</td>
+                        <td>${getStatVal(prefix, pId, 'reb')}</td>
+                        <td>${getStatVal(prefix, pId, 'ast')}</td>
+                        <td>${getStatVal(prefix, pId, 'stl')}</td>
+                        <td>${getStatVal(prefix, pId, 'blk')}</td>
+                        <td>${getStatVal(prefix, pId, 'to')}</td>
+                        <td>${getStatVal(prefix, pId, 'pf')}</td>
+                        <td class="pts-cell">${pts}</td>
+                    </tr>`;
+                });
+            }
+
+            return `
+                <div class="team-header-banner">
+                    <div class="team-info">
+                        <img src="${team.logo}" class="team-header-logo" onerror="this.src='https://via.placeholder.com/45'">
+                        <h2>${team.name} — OVERALL BOX SCORE</h2>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="stat-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="player-col">PLAYER</th>
+                                <th>2PT (M/A)</th><th>2FG%</th>
+                                <th>3PT (M/A)</th><th>3FG%</th>
+                                <th>4PT (M/A)</th><th>4FG%</th>
+                                <th>FT (M/A)</th><th>FT%</th>
+                                <th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PF</th>
+                                <th>PTS</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function getHeadersForFilter() {
+            let h = "";
+            const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+            quarters.forEach(q => {
+                if (currentQuarterFilter === 'ALL' || currentQuarterFilter === q) {
+                    h += `<th>${q} 2M</th><th>${q} 2A</th><th>${q} 3M</th><th>${q} 3A</th><th>${q} 4M</th><th>${q} 4A</th><th>${q} FTM</th><th>${q} FTA</th>`;
+                }
+            });
+            return h;
+        }
+
+        function calcTableTotals(prefix) {
+            const homeKey = document.getElementById("homeTeamSelect").value;
+            const awayKey = document.getElementById("awayTeamSelect").value;
+            const teamKey = prefix === 'home' ? homeKey : awayKey;
+            const team = teamsData[teamKey];
+
+            let totalPoints = 0;
+            team.roster.filter(p => p.active).forEach(p => {
+                let m2 = 0, m3 = 0, m4 = 0, ftm = 0;
+                ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                    m2 += getStatVal(prefix, p.id, `${q}_m2`);
+                    m3 += getStatVal(prefix, p.id, `${q}_m3`);
+                    m4 += getStatVal(prefix, p.id, `${q}_m4`);
+                    ftm += getStatVal(prefix, p.id, `${q}_ftm`);
+                });
+                totalPoints += (m2 * 2) + (m3 * 3) + (m4 * 4) + ftm;
+            });
+
+            const scoreEl = document.getElementById(`teamScore_${prefix}`);
+            if (scoreEl) scoreEl.textContent = `${totalPoints} PTS`;
+        }
+
+        function renderMatchup() {
+            const homeKey = document.getElementById("homeTeamSelect").value;
+            const awayKey = document.getElementById("awayTeamSelect").value;
+
+            document.getElementById("homeMatchupContainer").innerHTML = buildStatTableHTML(homeKey, "home");
+            document.getElementById("awayMatchupContainer").innerHTML = buildStatTableHTML(awayKey, "away");
+
+            document.getElementById("homePercentagesContainer").innerHTML = buildPercentagesTableHTML(homeKey, "home");
+            document.getElementById("awayPercentagesContainer").innerHTML = buildPercentagesTableHTML(awayKey, "away");
+
+            teamsData[homeKey].roster.filter(p => p.active).forEach(p => updateRowAndTotals('home', p.id));
+            teamsData[awayKey].roster.filter(p => p.active).forEach(p => updateRowAndTotals('away', p.id));
+        }
+
+        function setQuarterView(mode) {
+            currentQuarterFilter = mode;
+            document.querySelectorAll(".q-btn").forEach(b => b.classList.remove("active"));
+            event.target.classList.add("active");
+            renderMatchup();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll(".view-panel").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+
+            document.getElementById(tabId).classList.add("active");
+            event.currentTarget.classList.add("active");
+
+            if (tabId === 'percentages-view') {
+                renderMatchup();
+            }
+        }
+
+        function exportCSV() {
+            let csv = [];
+            let activeView = document.querySelector(".view-panel.active");
+            let tables = activeView.querySelectorAll("table.stat-table");
+
+            tables.forEach(table => {
+                let rows = table.querySelectorAll("tr");
+                rows.forEach(row => {
+                    let cols = row.querySelectorAll("th, td");
+                    let rowData = [];
+                    cols.forEach(col => {
+                        let valSpan = col.querySelector(".stat-val");
+                        if (valSpan) {
+                            rowData.push(valSpan.textContent.trim());
+                        } else {
+                            rowData.push(`"${col.textContent.trim()}"`);
+                        }
+                    });
+                    csv.push(rowData.join(","));
+                });
+                csv.push("");
+            });
+
+            let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            let downloadLink = document.createElement("a");
+            downloadLink.download = `Congre_Basketball_Match_${new Date().toISOString().slice(0,10)}.csv`;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
