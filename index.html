@@ -343,7 +343,14 @@
             border-color: var(--accent-gold);
         }
 
-        /* VERTICAL MATCHUP GRID */
+        /* SIDE-BY-SIDE MATCHUP GRID */
+        .matchup-grid-sidebyside {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            align-items: start;
+        }
+
         .matchup-grid-vertical {
             display: flex;
             flex-direction: column;
@@ -357,6 +364,7 @@
             padding: 8px;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            min-width: 0; /* Prevents CSS grid blowout */
         }
 
         .team-header-banner {
@@ -677,6 +685,12 @@
             margin-bottom: 12px;
         }
 
+        @media (max-width: 1150px) {
+            .matchup-grid-sidebyside {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 1024px) {
             body { padding: 4px; font-size: 12px; }
             .header-logo { width: 40px; height: 40px; }
@@ -771,16 +785,16 @@
         <button class="action-btn" onclick="exportCSV()">📥 Download CSV</button>
     </div>
 
-    <!-- LIVE MATCHUP VIEW (TOP AND BOTTOM) -->
+    <!-- LIVE MATCHUP VIEW (SIDE BY SIDE) -->
     <div id="matchup-view" class="view-panel active">
         <div class="matchup-selector-bar">
             <div class="team-select-box">
-                <label style="color:var(--accent-gold); font-weight:bold;">HOME TEAM (TOP):</label>
+                <label style="color:var(--accent-gold); font-weight:bold;">HOME TEAM (LEFT):</label>
                 <select id="homeTeamSelect" onchange="renderMatchup()"></select>
             </div>
             <div class="versus-badge">VS</div>
             <div class="team-select-box">
-                <label style="color:var(--accent-gold); font-weight:bold;">AWAY TEAM (BOTTOM):</label>
+                <label style="color:var(--accent-gold); font-weight:bold;">AWAY TEAM (RIGHT):</label>
                 <select id="awayTeamSelect" onchange="renderMatchup()"></select>
             </div>
         </div>
@@ -797,7 +811,7 @@
             <button class="action-btn reset-match-btn" style="padding: 4px 10px; font-size: 0.8rem;" onclick="resetLiveMatchStats()">🔄 Reset Live Stats to 0</button>
         </div>
 
-        <div class="matchup-grid-vertical">
+        <div class="matchup-grid-sidebyside">
             <div id="homeMatchupContainer" class="team-card"></div>
             <div id="awayMatchupContainer" class="team-card"></div>
         </div>
