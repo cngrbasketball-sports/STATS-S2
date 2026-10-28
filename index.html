@@ -148,15 +148,16 @@
         .quarter-breakdown {
             display: flex;
             justify-content: center;
-            gap: 6px;
-            font-size: 0.78rem;
+            gap: 4px;
+            font-size: 0.75rem;
             color: var(--text-muted);
             margin-bottom: 2px;
+            flex-wrap: wrap;
         }
 
         .quarter-breakdown span {
             background: var(--header-bg);
-            padding: 1px 5px;
+            padding: 1px 4px;
             border-radius: 4px;
             border: 1px solid var(--border-color);
         }
@@ -364,7 +365,7 @@
             padding: 8px;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            min-width: 0; /* Prevents CSS grid blowout */
+            min-width: 0;
         }
 
         .team-header-banner {
@@ -685,6 +686,20 @@
             margin-bottom: 12px;
         }
 
+        /* PRINT BOX SCORE CONTAINER STYLES */
+        #printBoxScoreContainer {
+            display: none;
+        }
+
+        @media print {
+            body { background: #fff !important; color: #000 !important; font-size: 11px !important; }
+            .nav-tabs, .matchup-selector-bar, .quarter-filter-bar, .actions-bar, .step-btns, .hotkey-banner, .theme-toggle-btn, input[type="radio"], input[type="checkbox"], .view-panel { display: none !important; }
+            #printBoxScoreContainer { display: block !important; }
+            .team-card { background: #fff; border: 1px solid #000; box-shadow: none; margin-bottom: 15px; }
+            table.stat-table th { background: #eee !important; color: #000 !important; }
+            .team-header-banner { background: #eee !important; border-left: 4px solid #000 !important; color: #000 !important; }
+        }
+
         @media (max-width: 1150px) {
             .matchup-grid-sidebyside {
                 grid-template-columns: 1fr;
@@ -703,13 +718,6 @@
             .stat-val { font-size: 0.82rem; width: 14px; }
             .step-btn { width: 13px; height: 10px; font-size: 7px; }
             .player-note-input { width: 45px; font-size: 0.68rem; }
-        }
-
-        @media print {
-            body { background: #fff !important; color: #000 !important; }
-            .nav-tabs, .matchup-selector-bar, .quarter-filter-bar, .actions-bar, .step-btns, .hotkey-banner, .theme-toggle-btn, input[type="radio"], input[type="checkbox"] { display: none !important; }
-            .team-card { background: #fff; border: 1px solid #000; }
-            table.stat-table th { background: #eee !important; color: #000 !important; }
         }
     </style>
 </head>
@@ -736,6 +744,7 @@
                 <span>Q2: <strong id="homeQ2Pts">0</strong></span>
                 <span>Q3: <strong id="homeQ3Pts">0</strong></span>
                 <span>Q4: <strong id="homeQ4Pts">0</strong></span>
+                <span>OT: <strong id="homeOtPts">0</strong></span>
             </div>
             <div class="running-total-score" id="homeTotalPts">0 PTS</div>
         </div>
@@ -747,6 +756,7 @@
                 <span>Q2: <strong id="awayQ2Pts">0</strong></span>
                 <span>Q3: <strong id="awayQ3Pts">0</strong></span>
                 <span>Q4: <strong id="awayQ4Pts">0</strong></span>
+                <span>OT: <strong id="awayOtPts">0</strong></span>
             </div>
             <div class="running-total-score" id="awayTotalPts">0 PTS</div>
         </div>
@@ -807,6 +817,7 @@
                 <button class="q-btn" onclick="setQuarterView('Q2')">Q2</button>
                 <button class="q-btn" onclick="setQuarterView('Q3')">Q3</button>
                 <button class="q-btn" onclick="setQuarterView('Q4')">Q4</button>
+                <button class="q-btn" onclick="setQuarterView('OT')">OT</button>
             </div>
             <button class="action-btn reset-match-btn" style="padding: 4px 10px; font-size: 0.8rem;" onclick="resetLiveMatchStats()">🔄 Reset Live Stats to 0</button>
         </div>
@@ -838,10 +849,20 @@
     <!-- ROSTER MANAGEMENT & TEAM ARCHIVES VIEWS -->
     <div id="single-team-views"></div>
 
+    <!-- PRINTABLE BOX SCORE CONTAINER (VISIBLE ONLY DURING PRINTING) -->
+    <div id="printBoxScoreContainer">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h2 style="font-size: 1.4rem; text-transform: uppercase;">Congre Basketball Olympics Season 2</h2>
+            <p style="font-size: 0.9rem; font-weight: bold; margin-top: 3px;" id="printMatchTitle">Official Box Score</p>
+        </div>
+        <div id="printHomeBoxScore" style="margin-bottom: 15px;"></div>
+        <div id="printAwayBoxScore"></div>
+    </div>
+
     <script>
         let currentQuarterFilter = 'ALL';
         let selectedPlayerContext = null; 
-        let currentTheme = 'night'; // default night mode
+        let currentTheme = 'night';
         
         let matchArchive = [
           {
@@ -1744,7 +1765,7 @@
 
         function updateRowAndTotals(prefix, pId) {
             let m2 = 0, a2 = 0, m3 = 0, a3 = 0, m4 = 0, a4 = 0, ftm = 0, fta = 0;
-            ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+            ['q1', 'q2', 'q3', 'q4', 'ot'].forEach(q => {
                 m2 += getStatVal(prefix, pId, `${q}_m2`);
                 a2 += getStatVal(prefix, pId, `${q}_a2`);
                 m3 += getStatVal(prefix, pId, `${q}_m3`);
@@ -1805,7 +1826,7 @@
 
                     if (currentQuarterFilter === 'ALL') {
                         let tot2m=0, tot2a=0, tot3m=0, tot3a=0, tot4m=0, tot4a=0, totftm=0, totfta=0;
-                        ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                        ['q1', 'q2', 'q3', 'q4', 'ot'].forEach(q => {
                             tot2m += getStatVal(prefix, pId, `${q}_m2`);
                             tot2a += getStatVal(prefix, pId, `${q}_a2`);
                             tot3m += getStatVal(prefix, pId, `${q}_m3`);
@@ -1891,7 +1912,7 @@
                 activePlayers.forEach(player => {
                     const pId = player.id;
                     let m2 = 0, a2 = 0, m3 = 0, a3 = 0, m4 = 0, a4 = 0, ftm = 0, fta = 0;
-                    ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                    ['q1', 'q2', 'q3', 'q4', 'ot'].forEach(q => {
                         m2 += getStatVal(prefix, pId, `${q}_m2`);
                         a2 += getStatVal(prefix, pId, `${q}_a2`);
                         m3 += getStatVal(prefix, pId, `${q}_m3`);
@@ -1978,10 +1999,10 @@
             const team = teamsData[teamKey];
 
             let totalPoints = 0;
-            let qPts = { q1: 0, q2: 0, q3: 0, q4: 0 };
+            let qPts = { q1: 0, q2: 0, q3: 0, q4: 0, ot: 0 };
 
             team.roster.filter(p => p.active).forEach(p => {
-                ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                ['q1', 'q2', 'q3', 'q4', 'ot'].forEach(q => {
                     let m2 = getStatVal(prefix, p.id, `${q}_m2`);
                     let m3 = getStatVal(prefix, p.id, `${q}_m3`);
                     let m4 = getStatVal(prefix, p.id, `${q}_m4`);
@@ -1993,7 +2014,7 @@
 
                 if (currentQuarterFilter === 'ALL') {
                     let tot2m=0, tot2a=0, tot3m=0, tot3a=0, tot4m=0, tot4a=0, totftm=0, totfta=0;
-                    ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+                    ['q1', 'q2', 'q3', 'q4', 'ot'].forEach(q => {
                         tot2m += getStatVal(prefix, p.id, `${q}_m2`);
                         tot2a += getStatVal(prefix, p.id, `${q}_a2`);
                         tot3m += getStatVal(prefix, p.id, `${q}_m3`);
@@ -2024,6 +2045,7 @@
                 document.getElementById("homeQ2Pts").textContent = qPts.q2;
                 document.getElementById("homeQ3Pts").textContent = qPts.q3;
                 document.getElementById("homeQ4Pts").textContent = qPts.q4;
+                document.getElementById("homeOtPts").textContent = qPts.ot;
                 document.getElementById("homeTotalPts").textContent = `${totalPoints} PTS`;
             } else {
                 document.getElementById("awayTeamScoreLabel").textContent = team.name;
@@ -2031,6 +2053,7 @@
                 document.getElementById("awayQ2Pts").textContent = qPts.q2;
                 document.getElementById("awayQ3Pts").textContent = qPts.q3;
                 document.getElementById("awayQ4Pts").textContent = qPts.q4;
+                document.getElementById("awayOtPts").textContent = qPts.ot;
                 document.getElementById("awayTotalPts").textContent = `${totalPoints} PTS`;
             }
 
@@ -2039,6 +2062,19 @@
 
             const scorePctEl = document.getElementById(`teamScore_${prefix}Percentages`);
             if (scorePctEl) scorePctEl.textContent = `${totalPoints} PTS`;
+
+            updatePrintableBoxScore();
+        }
+
+        function updatePrintableBoxScore() {
+            const homeKey = document.getElementById("homeTeamSelect").value;
+            const awayKey = document.getElementById("awayTeamSelect").value;
+            const homeTeam = teamsData[homeKey];
+            const awayTeam = teamsData[awayKey];
+
+            document.getElementById("printMatchTitle").textContent = `${homeTeam.name} vs ${awayTeam.name} — Official Box Score`;
+            document.getElementById("printHomeBoxScore").innerHTML = buildPercentagesTableHTML(homeKey, "home");
+            document.getElementById("printAwayBoxScore").innerHTML = buildPercentagesTableHTML(awayKey, "away");
         }
 
         function renderMatchup() {
